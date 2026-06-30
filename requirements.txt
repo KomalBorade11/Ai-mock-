@@ -1,0 +1,9 @@
+flask
+flask-cors
+langgraph
+langchain
+huggingface-hub
+transformers
+torch
+pdfplumber
+pandas

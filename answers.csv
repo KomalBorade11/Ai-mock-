@@ -1,0 +1,7 @@
+question,answer
+Can you explain the difference between REST and GraphQL?,REST is an architectural style for designing networked applications, using HTTP methods. GraphQL is a query language for APIs that allows clients to request exactly the data they need.
+What is the purpose of version control systems like Git?,Version control systems track changes to code over time, allowing multiple developers to collaborate, revert to previous versions, and manage branches.
+How do you handle state management in a React application?,State can be managed using local component state, Context API, or libraries like Redux for global state.
+What is the difference between supervised and unsupervised learning?,Supervised learning uses labeled data to train models for prediction, while unsupervised learning finds patterns in unlabeled data.
+Explain the bias-variance tradeoff.,Bias is error from wrong assumptions, variance is error from sensitivity to training data. The tradeoff balances model complexity.
+How do you handle missing data in a dataset?,Methods include deletion, imputation with mean/median, or using algorithms that handle missing values.

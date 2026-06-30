@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mock Interview - Real-Time Voice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .setup-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+        }
+
+        .interview-section {
+            padding: 30px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status-listening {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .status-idle {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .status-processing {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .transcript-area {
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .transcript-user {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .transcript-ai {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .transcript-interim {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .message-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: 20%;
+        }
+
+        .message-ai {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            margin-right: 20%;
+        }
+
+        .message-feedback {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .message-user,
+            .message-ai {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Section -->
+        <div id="setup-section" class="setup-section">
+            <div class="form-group">
+                <label for="resume-upload">Upload Your Resume (PDF)</label>
+                <input type="file" id="resume-upload" accept=".pdf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role-select">Select Your Interview Role</label>
+                <select id="role-select" required>
+                    <option value="">Choose a role...</option>
+                    <option value="Full Stack Developer">Full Stack Developer</option>
+                    <option value="Data Scientist">Data Scientist</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="DevOps Engineer">DevOps Engineer</option>
+                    <option value="Other">Other (specify below)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="custom-role-group" style="display: none;">
+                <label for="custom-role">Specify Your Role</label>
+                <input type="text" id="custom-role" placeholder="e.g., Machine Learning Engineer">
+            </div>
+
+            <button id="start-interview-btn" class="btn btn-primary" disabled>
+                Start Interview
+            </button>
+        </div>
+
+        <!-- Interview Section -->
+        <div id="interview-section" class="interview-section hidden">
+            <div id="status-indicator" class="status-indicator status-idle">
+                <span id="status-text">Ready to start interview</span>
+            </div>
+
+            <div class="timer">
+                <div>Time Remaining: <span id="time-remaining">30:00</span></div>
+                <div>Elapsed: <span id="time-elapsed">00:00</span></div>
+            </div>
+
+            <div class="controls">
+                <button id="start-mic-btn" class="btn btn-success">🎤 Start Microphone</button>
+                <button id="stop-mic-btn" class="btn btn-danger" disabled>⏹️ Stop Microphone</button>
+                <button id="end-interview-btn" class="btn btn-secondary">🏁 End Interview</button>
+            </div>
+
+            <div class="transcript-area">
+                <div id="live-transcript"></div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let sessionId = null;
+        let recognition = null;
+        let isListening = false;
+        let startTime = null;
+        let timerInterval = null;
+        let currentTranscript = '';
+        let chatHistory = [];
+        let currentQuestion = '';
+
+        // DOM elements
+        const setupSection = document.getElementById('setup-section');
+        const interviewSection = document.getElementById('interview-section');
+        const resumeUpload = document.getElementById('resume-upload');
+        const roleSelect = document.getElementById('role-select');
+        const customRoleGroup = document.getElementById('custom-role-group');
+        const customRole = document.getElementById('custom-role');
+        const startInterviewBtn = document.getElementById('start-interview-btn');
+        const startMicBtn = document.getElementById('start-mic-btn');
+        const stopMicBtn = document.getElementById('stop-mic-btn');
+        const endInterviewBtn = document.getElementById('end-interview-btn');
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const liveTranscript = document.getElementById('live-transcript');
+        const chatMessages = document.getElementById('chat-messages');
+        const timeRemaining = document.getElementById('time-remaining');
+        const timeElapsed = document.getElementById('time-elapsed');
+
+        // Backend URL
+        const BACKEND_URL = 'http://localhost:8001';
+
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+                return false;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isListening = true;
+                updateStatus('listening', '🎤 Listening... Speak now');
+                startMicBtn.disabled = true;
+                stopMicBtn.disabled = false;
+            };
+
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                if (finalTranscript) {
+                    currentTranscript += finalTranscript;
+                    updateLiveTranscript(currentTranscript, interimTranscript);
+
+                    // Send to backend for processing
+                    processTranscript(currentTranscript);
+                    currentTranscript = ''; // Reset for next segment
+                } else {
+                    updateLiveTranscript(currentTranscript, interimTranscript);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                updateStatus('idle', '❌ Error: ' + event.error);
+                stopListening();
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                updateStatus('idle', 'Microphone stopped');
+                startMicBtn.disabled = false;
+                stopMicBtn.disabled = true;
+            };
+
+            return true;
+        }
+
+        // Update status indicator
+        function updateStatus(type, text) {
+            statusIndicator.className = `status-indicator status-${type}`;
+            statusText.textContent = text;
+        }
+
+        // Update live transcript display
+        function updateLiveTranscript(finalText, interimText) {
+            liveTranscript.innerHTML = `
+                <div class="transcript-user">You: ${finalText}</div>
+                ${interimText ? `<div class="transcript-interim">${interimText}</div>` : ''}
+            `;
+        }
+
+        // Add message to chat
+        function addMessage(type, content, timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+
+            const time = timestamp ? new Date(timestamp * 1000).toLocaleTimeString() : new Date().toLocaleTimeString();
+
+            messageDiv.innerHTML = `
+                <strong>${type === 'user' ? 'You' : type === 'ai' ? 'AI Interviewer' : 'System'}:</strong>
+                <div>${content}</div>
+                <small style="opacity: 0.7;">${time}</small>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Store in history
+            chatHistory.push({
+                type: type,
+                content: content,
+                timestamp: timestamp || Date.now() / 1000
+            });
+        }
+
+        // Start listening
+        function startListening() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) return;
+            }
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                updateStatus('idle', '❌ Error starting microphone');
+            }
+        }
+
+        // Stop listening
+        function stopListening() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        }
+
+        // Process transcript with backend
+        async function processTranscript(answer) {
+            if (!answer.trim()) return;
+
+            updateStatus('processing', '🤖 Processing your response...');
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/process_transcript`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        answer: answer
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    updateStatus('idle', '❌ Error: ' + data.error);
+                    return;
+                }
+
+                // Add user message to chat
+                addMessage('user', answer);
+
+                // Handle different response types
+                if (data.completed) {
+                    updateStatus('idle', '🎉 Interview completed!');
+                    addMessage('feedback', data.final_feedback || 'Interview completed successfully!');
+                    stopTimer();
+                    endInterviewBtn.disabled = true;
+                } else if (data.feedback_phase) {
+                    updateStatus('idle', '📋 Final feedback phase');
+                    addMessage('feedback', data.feedback);
+                } else if (data.next_question) {
+                    updateStatus('idle', 'Ready for your response');
+                    currentQuestion = data.next_question;
+                    addMessage('ai', data.next_question);
+                }
+
+            } catch (error) {
+                console.error('Error processing transcript:', error);
+                updateStatus('idle', '❌ Error processing response');
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = Math.max(0, 1800 - elapsed); // 30 minutes
+
+            const elapsedMins = Math.floor(elapsed / 60);
+            const elapsedSecs = elapsed % 60;
+            const remainingMins = Math.floor(remaining / 60);
+            const remainingSecs = remaining % 60;
+
+            timeElapsed.textContent = `${elapsedMins.toString().padStart(2, '0')}:${elapsedSecs.toString().padStart(2, '0')}`;
+            timeRemaining.textContent = `${remainingMins.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
+
+            if (remaining <= 0) {
+                stopTimer();
+                updateStatus('idle', '⏰ Time\'s up! Interview completed.');
+                endInterview();
+            }
+        }
+
+        // Upload resume
+        async function uploadResume(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/upload_resume`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionId = data.session_id;
+                    updateStatus('idle', '✅ Resume uploaded successfully!');
+                    checkStartButton();
+                } else {
+                    alert('Error uploading resume: ' + (data.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error uploading resume:', error);
+                alert('Error uploading resume');
+            }
+        }
+
+        // Start interview
+        async function startInterview() {
+            const role = roleSelect.value === 'Other' ? customRole.value : roleSelect.value;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/start_interview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        session_id: sessionId,
+                        role: role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Switch to interview view
+                    setupSection.classList.add('hidden');
+                    interviewSection.classList.remove('hidden');
+
+                    // Add first question
+                    currentQuestion = data.current_question || '';
+                    addMessage('ai', data.current_question);
+
+                    // Start timer
+                    startTimer();
+
+                    updateStatus('idle', 'Interview started! Click "Start Microphone" to begin speaking.');
+                } else {
+                    alert('Error starting interview: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error starting interview:', error);
+                alert('Error starting interview');
+            }
+        }
+
+        // End interview
+        async function endInterview() {
+            stopListening();
+            stopTimer();
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/end_interview_early`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateStatus('idle', 'Interview ended early');
+                    if (data.feedback) {
+                        addMessage('feedback', data.feedback);
+                    }
+                }
+            } catch (error) {
+                console.error('Error ending interview:', error);
+            }
+        }
+
+        // Check if start button should be enabled
+        function checkStartButton() {
+            const roleSelected = roleSelect.value && (roleSelect.value !== 'Other' || customRole.value.trim());
+            startInterviewBtn.disabled = !(sessionId && roleSelected);
+        }
+
+        // Event listeners
+        resumeUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadResume(file);
+            }
+        });
+
+        roleSelect.addEventListener('change', function() {
+            customRoleGroup.style.display = roleSelect.value === 'Other' ? 'block' : 'none';
+            checkStartButton();
+        });
+
+        customRole.addEventListener('input', checkStartButton);
+
+        startInterviewBtn.addEventListener('click', startInterview);
+        startMicBtn.addEventListener('click', startListening);
+        stopMicBtn.addEventListener('click', stopListening);
+        endInterviewBtn.addEventListener('click', endInterview);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initSpeechRecognition();
+            checkStartButton();
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            stopListening();
+            stopTimer();
+        });
+    </script>
+</body>
+</html>
